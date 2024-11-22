@@ -3,6 +3,7 @@
 #include "../Model/CuckooHashTable.h"
 #include <fstream>
 #include <iostream>
+#include <string>
 
 using namespace std;
 
@@ -22,19 +23,20 @@ void loadIndexTable() {
   int numRecords = fileSize / 250;
   file.seekg(0, ios::beg);
 
-  for (int i = 0; i < numRecords; ++i) {
-    file.seekg(i * 250);
-    int sizeStr;
-    file.read(reinterpret_cast<char *>(&sizeStr), sizeof(sizeStr));
+  const size_t blockSize = 1000000;
+  vector<char> buffer(blockSize * 250);
 
-    vector<char> buffer(sizeStr);
-    file.read(buffer.data(), sizeStr);
+  for (size_t i = 0; i < numRecords; i += blockSize) {
+    size_t recordsToRead = std::min(blockSize, numRecords - i);
+    file.read(buffer.data(), recordsToRead * 250);
 
-    string record(buffer.begin(), buffer.end());
-    vector<string> cut = Tools::splitString(record, ';');
-
-    if (!cut.empty()) {
-      indexTable.insert(Data(stoi(cut[0]), i));
+    for (size_t j = 0; j < recordsToRead; ++j) {
+      const char *recordStart = buffer.data() + j * 250;
+      string record(recordStart, 250);
+      cout << record << endl;
+      vector<string> cut = Tools::splitString(record, ';');
+      string temp = cut[0].substr(4, 8);
+      indexTable.insert(Data(stoi(temp), i + j));
       binSave.addNumRecords();
     }
   }
@@ -56,7 +58,7 @@ void generar(int numRecords) {
       int dni = stoi(ciudadano.getDNI());
 
       if (indexTable.search(dni).key != dni) {
-        cout << i << "-" << dni << ": " << ciudadano.getNames() << endl;
+        // cout << i << "-" << dni << ": " << ciudadano.getNames() << endl;
         binSave.insert(ciudadano, file);
         Data data = Data(dni, binSave.getNumRecords());
         indexTable.insert(data);

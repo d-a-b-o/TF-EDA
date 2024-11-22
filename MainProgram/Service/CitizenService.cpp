@@ -15,17 +15,27 @@ using namespace std;
 
 class Service {
 private:
+  // Número del puerto donde el servidor correrá
   uint16_t m_portNum;
+  // Número de hilos para manejar peticiones concurrentes
   unsigned int m_numThreads;
+  // Direccion del servidor
   Pistache::Address m_address;
+  // Servidor Http
   shared_ptr<Pistache::Http::Endpoint> m_endPoint;
+  // Enrutador para definir rutas Http
   Pistache::Rest::Router m_router;
+
+  // Controlador para manejar la logica relacionada con Ciudadanos
   MainController dbController;
 
+  // Configura las rutas Http
   void configureRoutes();
 
   using Request = Pistache::Rest::Request;
   using Response = Pistache::Http::ResponseWriter;
+
+  // Manejan las operaciones especificas sobre los Ciudadanos
   void getCitizen(const Request &request, Response response);
   void updateCitizen(const Request &request, Response response);
   void createCitizen(const Request &request, Response response);
@@ -103,7 +113,7 @@ void Service::createCitizen(const Request &request, Response response) {
 
 void Service::run() {
   cout << "Starting on port " << m_portNum << " with " << m_numThreads
-       << " threads.\n";
+       << " thread.\n";
   m_endPoint->init(Pistache::Http::Endpoint::options().threads(m_numThreads));
   configureRoutes();
   m_endPoint->setHandler(m_router.handler());
