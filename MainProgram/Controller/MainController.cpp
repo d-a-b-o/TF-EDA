@@ -5,9 +5,9 @@ using namespace std;
 MainController::MainController() { loadIndexTable(); }
 
 string MainController::addCitizen(Citizen &citizen) {
-  citizen.setDNI(to_string(indexTable.getCurrentSize() + 10000000));
+  citizen.setDNI(to_string(indexTable.getCurrentSize() + 1));
 
-  indexTable.insert(Data(stoi(citizen.getDNI()), indexTable.getCurrentSize()));
+  indexTable.insert(Data(stoi(citizen.getDNI())));
   binarySave.write(citizen);
 
   return citizen.getDNI();
@@ -20,7 +20,7 @@ Citizen MainController::searchCitizen(size_t &DNI) {
     throw runtime_error("Invalid id " + to_string(DNI));
   }
 
-  return binarySave.read(found.data);
+  return binarySave.read(found.key - 1);
 }
 
 void MainController::updateCitizen(Citizen &citizen) {
@@ -30,7 +30,7 @@ void MainController::updateCitizen(Citizen &citizen) {
     throw runtime_error("Invalid id" + citizen.getDNI());
   }
 
-  binarySave.overwrite(citizen, found.data);
+  binarySave.overwrite(citizen);
 }
 
 void MainController::loadIndexTable() {
@@ -57,7 +57,8 @@ void MainController::loadIndexTable() {
       string record(recordStart, 250);
       vector<string> cut = Tools::splitString(record, ';');
       string temp = cut[0].substr(4, 8);
-      indexTable.insert(Data(stoi(temp), i + j));
+      cout << temp << endl;
+      indexTable.insert(Data(stoi(temp)));
       binarySave.addNumRecords();
     }
   }

@@ -1,5 +1,6 @@
 #include "BinarySave.h"
 #include <fstream>
+#include <iosfwd>
 
 using namespace std;
 
@@ -71,7 +72,7 @@ void BinarySave::write(Citizen &citizen) {
   file.close();
 }
 
-void BinarySave::overwrite(Citizen &citizen, streampos position) {
+void BinarySave::overwrite(Citizen &citizen) {
   fstream file(DATA_ROUTE, ios::in | ios::out | ios::binary);
   if (!file.is_open()) {
     return;
@@ -87,6 +88,7 @@ void BinarySave::overwrite(Citizen &citizen, streampos position) {
   record += string(245 - record.length(), ' ') + ";";
 
   int sizeStr = record.size();
+  streampos position = stoi(citizen.getDNI()) - 1;
 
   file.seekp(position * RECORD_SIZE);
   file.write(reinterpret_cast<const char *>(&sizeStr), sizeof(sizeStr));

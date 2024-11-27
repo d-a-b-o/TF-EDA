@@ -21,5 +21,5 @@ public:
   Citizen read(streampos pos);
   void insert(Citizen &citizen, fstream &file);
   void write(Citizen &citizen);
-  void overwrite(Citizen &citizen, streampos pos);
+  void overwrite(Citizen &citizen);
 };

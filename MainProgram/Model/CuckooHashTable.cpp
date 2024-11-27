@@ -32,14 +32,10 @@ int CuckooHashTable::getCurrentSize() { return currentSize; }
 
 void CuckooHashTable::insert(Data data) {
   Data found = search(data.key);
-  int count = 0;
+  int collisionCount = 0;
 
   if (found.key == data.key) {
     return;
-  }
-
-  if (currentSize == tableSize * numTables / 2) {
-    rehash();
   }
 
   do {
@@ -58,10 +54,8 @@ void CuckooHashTable::insert(Data data) {
       data.numHash++;
     }
 
-    count++;
-  } while (count < MAX_COLLISIONS);
-
-  cout << "pipipi" << endl;
+    collisionCount++;
+  } while (collisionCount < MAX_COLLISIONS);
 
   rehash();
   insert(data);
